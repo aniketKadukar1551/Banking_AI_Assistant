@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking AI Assistant - Secure Support Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            padding: 40px;
+        }
+
+        .sidebar {
+            background: var(--light);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .sidebar h3 {
+            color: var(--dark);
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .agent-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 2px solid var(--border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .agent-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .agent-card.active {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        }
+
+        .agent-card h4 {
+            color: var(--dark);
+            font-size: 1rem;
+            margin-bottom: 6px;
+        }
+
+        .agent-card p {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        .chat-area {
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: var(--light);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message-content {
+            display: inline-block;
+            max-width: 70%;
+            padding: 16px 20px;
+            border-radius: 16px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            color: var(--dark);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+            text-align: left;
+        }
+
+        .message-label {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .chat-input-area {
+            padding: 24px;
+            border-top: 1px solid var(--border);
+            background: white;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .send-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .send-btn:active {
+            transform: translateY(0);
+        }
+
+        .quick-actions {
+            margin-top: 16px;
+        }
+
+        .quick-actions h4 {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
+        .quick-action-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 16px 20px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            max-width: 70px;
+        }
+
+        .typing-indicator.active {
+            display: inline-block;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--gray);
+            border-radius: 50%;
+            margin-right: 4px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏦 Banking AI Assistant</h1>
+            <p>Secure Support Portal with RAG-Powered Intelligence</p>
+        </div>
+
+        <div class="main-content">
+            <div class="sidebar">
+                <h3><span class="status-indicator"></span>Available Agents</h3>
+                <div class="agent-card active" data-agent="orchestrator">
+                    <h4>🤖 Smart Orchestrator</h4>
+                    <p>Auto-routes to the right agent</p>
+                </div>
+                <div class="agent-card" data-agent="account">
+                    <h4>💰 Account Services</h4>
+                    <p>Balance, details & account info</p>
+                </div>
+                <div class="agent-card" data-agent="transaction">
+                    <h4>💳 Transactions</h4>
+                    <p>History, transfers & payments</p>
+                </div>
+                <div class="agent-card" data-agent="card">
+                    <h4>🔒 Card Services</h4>
+                    <p>Block, replace & manage cards</p>
+                </div>
+                <div class="agent-card" data-agent="rag">
+                    <h4>📚 Policy Knowledge</h4>
+                    <p>Fees, KYC & dispute process</p>
+                </div>
+            </div>
+
+            <div class="chat-area">
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message assistant">
+                        <div class="message-label">Banking Assistant</div>
+                        <div class="message-content">
+                            👋 Welcome to the Banking AI Assistant! I can help you with:
+                            <br><br>
+                            • Account balance and details<br>
+                            • Transaction history and transfers<br>
+                            • Card services (block, replace)<br>
+                            • Banking policies and fees<br>
+                            • Dispute processes<br>
+                            <br>
+                            How can I assist you today?
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chat-input-area">
+                    <div class="quick-actions">
+                        <h4>Quick Actions:</h4>
+                        <button class="quick-action-btn" onclick="sendQuickMessage('What is my account balance?')">💰
+                            Check Balance</button>
+                        <button class="quick-action-btn"
+                            onclick="sendQuickMessage('What are the international wire transfer fees?')">💵 Wire
+                            Fees</button>
+                        <button class="quick-action-btn" onclick="sendQuickMessage('Block my card')">🔒 Block
+                            Card</button>
+                        <button class="quick-action-btn"
+                            onclick="sendQuickMessage('How do I dispute a transaction?')">⚠️ Dispute Info</button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" class="chat-input" id="userInput" placeholder="Type your message here..."
+                            onkeypress="handleKeyPress(event)">
+                        <button class="send-btn" onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock responses for demo purposes
+        const mockResponses = {
+            'balance': {
+                type: 'account',
+                response: '💰 Your current account balance is <strong>$5,432.10 USD</strong>.<br><br>Account: Checking (Active)<br>Owner: John Doe'
+            },
+            'wire': {
+                type: 'rag',
+                response: '📋 <strong>Wire Transfer Fees:</strong><br><br>• Domestic Incoming: $15.00<br>• Domestic Outgoing: $30.00<br>• International Incoming: $16.00<br>• International Outgoing: $45.00<br><br><em>Source: fee_schedule.pdf</em>'
+            },
+            'block': {
+                type: 'card',
+                response: '🔒 <strong>Card Blocked Successfully</strong><br><br>Card ending in *4321 has been blocked for security.<br><br>Would you like to request a replacement card?'
+            },
+            'dispute': {
+                type: 'rag',
+                response: '⚖️ <strong>Transaction Dispute Process:</strong><br><br>1. <strong>Notification:</strong> Notify within 60 days of statement date<br>2. <strong>Provisional Credit:</strong> Provided within 10 business days<br>3. <strong>Investigation:</strong> Takes 45-90 days<br>4. <strong>Resolution:</strong> Written notification of outcome<br><br>To initiate: Call customer service or use mobile app.<br><br><em>Source: dispute_process.pdf</em>'
+            },
+            'transactions': {
+                type: 'transaction',
+                response: '📊 <strong>Recent Transactions:</strong><br><br>• 2023-10-25: Grocery Store - <span style="color: #ef4444;">-$150.00</span><br>• 2023-10-24: Paycheck - <span style="color: #10b981;">+$2,500.00</span><br>• 2023-10-22: Electric Bill - <span style="color: #ef4444;">-$120.50</span>'
+            },
+            'default': {
+                type: 'orchestrator',
+                response: 'I understand you\'re asking about banking services. Could you please be more specific? I can help with account info, transactions, card services, or policy questions.'
+            }
+        };
+
+        function sendQuickMessage(message) {
+            document.getElementById('userInput').value = message;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Simulate AI response
+            setTimeout(() => {
+                hideTypingIndicator();
+                const response = getResponse(message);
+                addMessage(response.response, 'assistant');
+            }, 1500);
+        }
+
+        function addMessage(content, type) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const label = type === 'user' ? 'You' : 'Banking Assistant';
+            messageDiv.innerHTML = `
+                <div class="message-label">${label}</div>
+                <div class="message-content">${content}</div>
+            `;
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message assistant';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="message-label">Banking Assistant</div>
+                <div class="typing-indicator active">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        function getResponse(message) {
+            const lowerMessage = message.toLowerCase();
+
+            if (lowerMessage.includes('balance')) {
+                return mockResponses.balance;
+            } else if (lowerMessage.includes('wire') || lowerMessage.includes('fee')) {
+                return mockResponses.wire;
+            } else if (lowerMessage.includes('block') || lowerMessage.includes('card')) {
+                return mockResponses.block;
+            } else if (lowerMessage.includes('dispute')) {
+                return mockResponses.dispute;
+            } else if (lowerMessage.includes('transaction')) {
+                return mockResponses.transactions;
+            } else {
+                return mockResponses.default;
+            }
+        }
+
+        // Agent card selection
+        document.querySelectorAll('.agent-card').forEach(card => {
+            card.addEventListener('click', function () {
+                document.querySelectorAll('.agent-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+
+</html>
