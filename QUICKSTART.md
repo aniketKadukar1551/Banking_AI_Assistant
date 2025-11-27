@@ -27,8 +27,44 @@ pip install -r requirements.txt
 # Generate data
 python data_gen.py
 
-# Run demo
+# Run CLI demo
 python main.py
+
+# OR run API server
+python main.py --api
+```
+
+## Running Modes
+
+### 1. CLI Demo Mode (Default)
+```bash
+python main.py
+```
+Runs 5 demo scenarios in the terminal.
+
+### 2. Web API Mode (with Frontend)
+```bash
+python main.py --api
+```
+Starts the FastAPI server on `http://localhost:8000`
+
+- **Web Interface**: Open browser to `http://localhost:8000`
+- **API Endpoint**: `POST http://localhost:8000/api/ask`
+- **Health Check**: `GET http://localhost:8000/api/health`
+
+#### API Usage Example:
+```bash
+curl -X POST http://localhost:8000/api/ask \
+  -H "Content-Type: application/json" \
+  -d '{"query": "What is my account balance?"}'
+```
+
+Response:
+```json
+{
+  "response": "Your current account balance is $5,432.10 USD...",
+  "status": "success"
+}
 ```
 
 ## What to Expect

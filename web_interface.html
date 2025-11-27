@@ -408,33 +408,7 @@
     </div>
 
     <script>
-        // Mock responses for demo purposes
-        const mockResponses = {
-            'balance': {
-                type: 'account',
-                response: '💰 Your current account balance is <strong>$5,432.10 USD</strong>.<br><br>Account: Checking (Active)<br>Owner: John Doe'
-            },
-            'wire': {
-                type: 'rag',
-                response: '📋 <strong>Wire Transfer Fees:</strong><br><br>• Domestic Incoming: $15.00<br>• Domestic Outgoing: $30.00<br>• International Incoming: $16.00<br>• International Outgoing: $45.00<br><br><em>Source: fee_schedule.pdf</em>'
-            },
-            'block': {
-                type: 'card',
-                response: '🔒 <strong>Card Blocked Successfully</strong><br><br>Card ending in *4321 has been blocked for security.<br><br>Would you like to request a replacement card?'
-            },
-            'dispute': {
-                type: 'rag',
-                response: '⚖️ <strong>Transaction Dispute Process:</strong><br><br>1. <strong>Notification:</strong> Notify within 60 days of statement date<br>2. <strong>Provisional Credit:</strong> Provided within 10 business days<br>3. <strong>Investigation:</strong> Takes 45-90 days<br>4. <strong>Resolution:</strong> Written notification of outcome<br><br>To initiate: Call customer service or use mobile app.<br><br><em>Source: dispute_process.pdf</em>'
-            },
-            'transactions': {
-                type: 'transaction',
-                response: '📊 <strong>Recent Transactions:</strong><br><br>• 2023-10-25: Grocery Store - <span style="color: #ef4444;">-$150.00</span><br>• 2023-10-24: Paycheck - <span style="color: #10b981;">+$2,500.00</span><br>• 2023-10-22: Electric Bill - <span style="color: #ef4444;">-$120.50</span>'
-            },
-            'default': {
-                type: 'orchestrator',
-                response: 'I understand you\'re asking about banking services. Could you please be more specific? I can help with account info, transactions, card services, or policy questions.'
-            }
-        };
+        const API_URL = 'http://localhost:8000/api/ask';
 
         function sendQuickMessage(message) {
             document.getElementById('userInput').value = message;
@@ -447,7 +421,7 @@
             }
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('userInput');
             const message = input.value.trim();
 
@@ -460,12 +434,30 @@
             // Show typing indicator
             showTypingIndicator();
 
-            // Simulate AI response
-            setTimeout(() => {
+            // Call AI API
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: message })
+                });
+
+                const data = await response.json();
+                
                 hideTypingIndicator();
-                const response = getResponse(message);
-                addMessage(response.response, 'assistant');
-            }, 1500);
+                
+                if (data.error) {
+                    addMessage(`❌ Error: ${data.error}`, 'assistant');
+                } else {
+                    addMessage(data.response, 'assistant');
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                addMessage('❌ Unable to connect to AI service. Please ensure the server is running.', 'assistant');
+                console.error('API Error:', error);
+            }
         }
 
         function addMessage(content, type) {
@@ -502,24 +494,6 @@
             const indicator = document.getElementById('typingIndicator');
             if (indicator) {
                 indicator.remove();
-            }
-        }
-
-        function getResponse(message) {
-            const lowerMessage = message.toLowerCase();
-
-            if (lowerMessage.includes('balance')) {
-                return mockResponses.balance;
-            } else if (lowerMessage.includes('wire') || lowerMessage.includes('fee')) {
-                return mockResponses.wire;
-            } else if (lowerMessage.includes('block') || lowerMessage.includes('card')) {
-                return mockResponses.block;
-            } else if (lowerMessage.includes('dispute')) {
-                return mockResponses.dispute;
-            } else if (lowerMessage.includes('transaction')) {
-                return mockResponses.transactions;
-            } else {
-                return mockResponses.default;
             }
         }
 
