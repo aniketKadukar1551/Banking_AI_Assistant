@@ -8,15 +8,19 @@ def main():
     print("Banking Support AI Assistant + Milvus RAG Demo")
     print("="*50)
 
-    # Check for AI configuration
-    use_ai = os.getenv("USE_AI", "false").lower() == "true"
+    # Check for AI configuration (strict requirement)
     api_key = os.getenv("OPENAI_API_KEY")
     
-    if use_ai and api_key:
-        print("\n[System] AI Mode: ENABLED")
-    else:
-        print("\n[System] AI Mode: DISABLED (set USE_AI=true and OPENAI_API_KEY to enable)")
-        use_ai = False
+    if not api_key:
+        print("\n[System] ERROR: AI configuration missing!")
+        print("[System] This assistant requires AI to function.")
+        print("[System] Please set OPENAI_API_KEY in your environment:")
+        print("         export OPENAI_API_KEY=your_api_key_here")
+        print("         or create a .env file with OPENAI_API_KEY=your_api_key_here")
+        print("\n[System] Exiting...")
+        return
+
+    print("\n[System] AI Mode: ENABLED")
 
     # 1. Initialize RAG and Ingest Data
     print("[System] Initializing RAG Engine...")
@@ -31,8 +35,8 @@ def main():
     rag.ingest_docs(data_files)
     print("[System] RAG Initialization Complete.")
 
-    # 2. Initialize Orchestrator with optional AI
-    orchestrator = Orchestrator(rag, use_ai=use_ai, api_key=api_key)
+    # 2. Initialize Orchestrator with AI
+    orchestrator = Orchestrator(rag, api_key)
 
     # 3. Demo Scenarios
     scenarios = [
